@@ -1,0 +1,260 @@
+#include <stdio.h>
+#include<fstream>
+#include <vector>
+#include <string>
+#include <map>
+#include<iostream>
+using namespace std;
+double calculateError(float x, float y, float ex, float ey,float cov )
+{
+  return (x/y)*(sqrt(((ex/x)*(ex/x))+((ey/y)*(ey/y))-(2*cov/x*y)));
+    }
+void overlayPlots(string filename, string filename1, string filename2)
+{
+  char* hname = new char[200];
+  char* hname1 = new char[200];
+    char* hname2 = new char[200];
+
+ char* hist_name  = new char[200];
+  char* hist_name1 = new char[200];
+  char* hist_name2 = new char[200];
+char* full_path = new char[2000];
+  char* full_path1 = new char[2000];
+  char* full_path2 = new char[2000];
+  char* path2 = new char[2000];
+  char* title= new char[2000];
+char* title1= new char[2000];char* title2= new char[2000];
+  char* full_path3 = new char[2000];
+  char* full_path4 = new char[2000];
+  char* full_path5 = new char[2000];
+  char* full_path6 = new char[2000];
+  char* full_path7 = new char[2000];
+  char* full_path8 = new char[2000];
+  char* full_path9 = new char[2000];
+  char* full_path10 = new char[2000];
+  char* full_path11= new char[2000];
+  sprintf(hname,"%s",filename.c_str());
+  sprintf(hname1,"%s",filename1.c_str());
+   sprintf(hname2,"%s",filename2.c_str());
+
+  sprintf(path2,"Results/camparison_with_old_ss/1D_comaprison_SSInEE");//,filename.c_str());
+  TFile * inputfile = new TFile(hname,"READ");
+  TFile * inputfile1 = new TFile(hname1,"READ");
+  TFile * inputfile2 = new TFile(hname2,"READ");
+
+  char* reso_name=new char[1000];
+  char* resp_name=new char[1000];
+  char* name=new char[1000];
+  char* name1=new char[1000];
+  char* name2=new char[1000];
+
+
+  const char *data[3] ={"Valid","Train","Tbdata"};// {"Model_ConstLR","Model_2ipFeat","Model_1ipFeat"};////,"p"); "Valid", "Train",
+
+  //                             "Tbdata" };
+  //const char *data1[3]={"DRN (E,x,y,z)","DRN (E, z)","DRN (E)"};
+  //const char *data1[3]={"All Pions","EE_{frac}<0.06","EE_{frac}>0.06"};
+  //const char *data1[3]={"All Pions","MipsInEE","SSInEE"};
+    const char *data1[3]={"Optimized #chi^{2}","Default #chi^{2}","DRN (E[GeV])"};
+  const char* tag[3]={"MipsInEE","SSInEE","Data"};
+const char *Energy[8]={"20","50","80","100","120","200","250","300"};
+int Elist[8]={20,50,80,100,120,200,250,300};
+ // int Elist[85] =  {10, 14 , 18 , 22 , 26 , 30,  34 , 38 , 42,  46,  50,  54,  58,  62,  66,  70,  74,  78,
+ //                     82,  86,  90,  94,  98, 102, 106, 110, 114 ,118, 122, 126, 130, 134, 138, 142 ,146, 150,
+ //                     154 ,158 ,162 ,166 ,170 ,174 ,178, 182, 186, 190 ,194 ,198, 202, 206, 210, 214 ,218, 222,
+ //                     226, 230, 234 ,238, 242 ,246 ,250, 254, 258 ,262 ,266, 270, 274, 278, 282, 286, 290, 294,
+ //                     298, 302 ,306, 310, 314, 318 ,322, 326, 330, 334 ,338 ,342 ,346};
+ 
+ float xmin=0, xmax=0,xhigh=0;
+ float mean=0, sigma=0, mean_err=0,sigma_err=0,Err_resolution=0, Err_response=0,resolution=0, response=0;
+ int rebin=4;
+ TF1* fit_func_data = new TF1("fit_func_data","gaus");
+			 
+ for(int i =1;i<2;i++)
+   {
+ for(int i_en=0;i_en<8;i_en++)
+   {
+     if(Elist[i_en]<=120)
+       xhigh= 6.0*Elist[i_en];
+     else
+       xhigh= 4.0*Elist[i_en];
+     //      cout<<xhigh<<endl;                                                                                                                                                                       
+     sprintf(hist_name,"%s_Predi_TrueEn_%d",data[i],Elist[i_en]);//,Elist[i_en]+4);
+     sprintf(hist_name1,"%s_Predi_TrueEn_%d",data[i],Elist[i_en]);//,Elist[i_en]+4);
+     sprintf(hist_name2,"%s_Predi_TrueEn_%d",data[i],Elist[i_en]);
+     
+     TH1F* resp= (TH1F*)inputfile->Get(hist_name);
+     TH1F* resp1= (TH1F*)inputfile1->Get(hist_name);
+     TH1F* resp2= (TH1F*)inputfile2->Get(hist_name);
+     Double_t factor = 1.;
+     resp2->Scale(factor/resp2->Integral());///resp2->GetEntries());
+     //resp2->Rebin(rebin);
+     resp1->Scale(factor/resp1->Integral());//resp1->GetEntries()/resp2->GetEntries());
+     resp->Scale(factor/resp->Integral());//resp->GetEntries()/resp2->GetEntries());
+     resp->Rebin(rebin);
+     resp1->Rebin(rebin);
+     resp2->Rebin(rebin);
+
+     TCanvas *Canvas_n2 = new TCanvas(hist_name, hist_name,800,700);
+     Canvas_n2->SetRightMargin(0.025);
+  Canvas_n2->SetLeftMargin(0.13);
+  Canvas_n2->SetTopMargin(0.06);
+   Canvas_n2->SetBottomMargin(0.12);
+
+     // Canvas_n2->Range(-60.25,-0.625,562.25,0.625);
+     Canvas_n2->SetFillColor(0);
+     Canvas_n2->SetBorderMode(0);
+     Canvas_n2->SetBorderSize(2);
+
+     TPaveStats *ptstats = new TPaveStats(0.7,0.7,0.9,0.9,"brNDC");
+     ptstats->SetBorderSize(1);
+     ptstats->SetFillColor(0);
+     ptstats->SetLineColor(kBlue);
+     ptstats->SetTextAlign(12);
+     ptstats->SetTextColor(kBlue);
+     ptstats->SetTextFont(42);
+     ptstats->SetOptStat(1111);
+     ptstats->SetOptFit(1);
+     // resp->GetListOfFunctions()->Add(ptstats);
+     // ptstats->SetParent(resp);
+
+     TPaveStats *ptstats1 = new TPaveStats(0.7,0.5,0.9,0.7,"brNDC");
+     ptstats1->SetBorderSize(1);
+     ptstats1->SetFillColor(0);
+     ptstats1->SetLineColor(kMagenta);
+     ptstats1->SetTextAlign(12);
+     ptstats1->SetTextColor(kMagenta);
+     ptstats1->SetTextFont(42);
+     ptstats1->SetOptStat(1111);
+     ptstats1->SetOptFit(1);
+     // resp1->GetListOfFunctions()->Add(ptstats1);
+     // ptstats1->SetParent(resp1);
+
+     TPaveStats *ptstats2 = new TPaveStats(0.7,0.3,0.9,0.5,"brNDC");
+     ptstats2->SetBorderSize(1);
+     ptstats2->SetFillColor(0);
+     ptstats2->SetLineColor(kGreen+2);
+     ptstats2->SetTextAlign(12);
+     ptstats2->SetTextColor(kGreen+2);
+     ptstats2->SetTextFont(42);
+     ptstats2->SetOptStat(1111);
+     ptstats2->SetOptFit(1);
+     // resp2->GetListOfFunctions()->Add(ptstats2);
+     // ptstats2->SetParent(resp2);
+     gStyle->SetOptStat(0);
+     sprintf(full_path,"%s/SSInEE_PredEn_%03d.png",path2,Elist[i_en]);
+     sprintf(full_path1,"%s/SSInEE_PredEn_%03d.pdf",path2,Elist[i_en]);
+     resp->GetXaxis()->SetTitle("Energy [GeV]");
+     resp1->GetXaxis()->SetTitle("Energy [GeV]");
+     resp2->GetXaxis()->SetTitle("Energy [GeV]");
+     resp->GetYaxis()->SetTitle("Normalized to unit area");
+     resp1->GetYaxis()->SetTitle("Normalized to unit area");
+     resp2->GetYaxis()->SetTitle("Normalized to unit area");
+
+     resp->GetXaxis()->SetTitleSize(00.05);
+    resp->GetXaxis()->SetLabelSize(0.04);
+    resp->GetYaxis()->SetLabelSize(0.04);
+    resp->GetYaxis()->SetTitleSize(00.05);
+    resp->GetYaxis()->SetTitleOffset(1.35);
+
+          resp1->GetXaxis()->SetTitleSize(00.05);
+    resp1->GetXaxis()->SetLabelSize(0.04);
+    resp1->GetYaxis()->SetLabelSize(0.04);
+    resp1->GetYaxis()->SetTitleSize(00.05);
+    resp1->GetYaxis()->SetTitleOffset(1.35);
+resp2->GetXaxis()->SetTitleSize(00.05);
+    resp2->GetXaxis()->SetLabelSize(0.04);
+    resp2->GetYaxis()->SetLabelSize(0.04);
+    resp2->GetYaxis()->SetTitleSize(00.05);
+    resp2->GetYaxis()->SetTitleOffset(1.35);
+
+     sprintf(name,"%s_%d",data1[0],Elist[i_en]);
+     sprintf(name1,"%s_%d",data1[1],Elist[i_en]);
+     sprintf(name2,"%s_%d",data1[2],Elist[i_en]);
+     sprintf(title,"");//%d (GeV)",Elist[i_en]);//,data[i_data]);
+
+     resp->SetLineColor(kBlue);
+     resp1->SetLineColor(kBlack);
+     resp2->SetLineColor(kGreen+2);
+
+     resp->SetLineWidth(2);
+     resp1->SetLineWidth(4);
+     resp1->SetLineStyle(7);
+     resp2->SetLineStyle(9);
+     resp2->SetLineWidth(4);
+     resp->SetName(name);
+     resp->SetTitle(title);
+     resp1->SetName(name1);
+     resp1->SetTitle(title);
+     resp2->SetName(name2);
+     resp2->SetTitle(title);
+     resp->GetXaxis()->SetRangeUser(0,xhigh);
+     resp1->GetXaxis()->SetRangeUser(0,xhigh);
+     resp2->GetXaxis()->SetRangeUser(0,xhigh);
+     auto legend = new TLegend(0.65,0.65,0.8,0.8);
+     legend->SetLineColor(kWhite);
+     char* lhead = new char[100];
+     sprintf(lhead,"%s : #bf{%d GeV #pi^{-}}",tag[i],Elist[i_en]);//, tag[i]);
+     legend->SetHeader(lhead);
+     // char* lhead1 = new char[100];
+     // sprintf(lhead1,"%d GeV #pi^{-}}",Elist[i_en]);
+     // legend->SetHeader(lhead);
+
+     //legend->SetHeader("","C");
+     TLegendEntry* leg_entry = legend->AddEntry(resp,data1[0],"l");
+     leg_entry->SetTextColor(kBlue);//resp->GetMarkerColor());
+     TLegendEntry* leg_entry1 = legend->AddEntry(resp1,data1[1],"l");
+     leg_entry1->SetTextColor(kBlack);//resp1->GetMarkerColor());
+     //TLegendEntry* leg_entry2 = legend->AddEntry(resp2,data1[2],"l");
+     //leg_entry2->SetTextColor(kGreen+2);//resp2->GetMarkerColor());
+
+    //  legend->AddEntry(resp,"Model_4ipFeat","l");
+    //  legend->AddEntry(resp1,"Model_2ipFeat","l");
+    // legend->AddEntry(resp2,"Model_1ipFeat","l");
+      auto legend1 = new TLegend(0.9,0.9,0.95,0.9);
+      legend1->SetLineColor(kWhite);
+
+     legend1->SetHeader("","C");
+      TLegendEntry* leg_entry10 = legend1->AddEntry(resp,data1[0],"l");
+      leg_entry10->SetTextColor(kBlue);//resp->GetMarkerColor());
+     TLegendEntry* leg_entry11 = legend1->AddEntry(resp1,data1[1],"l");
+     leg_entry11->SetTextColor(kBlack);//resp1->GetMarkerColor());
+    // TLegendEntry* leg_entry12 = legend1->AddEntry(resp2,data1[2],"l");
+    // leg_entry12->SetTextColor(kGreen+2);//resp2->GetMarkerColor());
+
+     gStyle->SetLegendTextSize(0.035);
+	
+    // gStyle->SetLegendTextSize(0.055);
+     gPad->SetLogy();
+     Canvas_n2->cd();
+
+     // if(i_en==1 || i_en==5 || i_en==4)
+     //   {
+     // 	 resp->Draw("HIST");
+     // 	 resp1->Draw("HISTsames");
+     // 	 resp2->Draw("HIST sames");
+     //   }
+     // else
+     //   {
+	 resp->Draw("HIST");
+	 resp1->Draw("HIST sames");
+ //resp2->Draw("HISTsames");
+	 //       }
+
+ // if(i_en<=2)
+   
+   legend->Draw("sames");
+    TLatex* textOnTop = new TLatex();
+     textOnTop->SetTextSize(0.04);
+     textOnTop->DrawLatexNDC(0.12,0.96,"");
+
+ // else
+ //   legend1->Draw("sames");
+     Canvas_n2->Modified();
+     Canvas_n2->cd();
+     Canvas_n2->SetSelected(Canvas_n2);
+     Canvas_n2->SaveAs(full_path);
+       Canvas_n2->SaveAs(full_path1);
+   }
+   }
+}

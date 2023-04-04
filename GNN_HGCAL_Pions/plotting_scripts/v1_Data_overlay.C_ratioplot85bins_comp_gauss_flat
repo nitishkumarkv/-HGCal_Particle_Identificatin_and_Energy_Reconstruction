@@ -1,0 +1,449 @@
+#include <stdio.h>
+#include<fstream>
+#include <vector>
+#include <string>
+#include <map>
+#include<iostream>
+using namespace std;
+void v1_Data_overlay(string file_name, string file_name_test, string file_name_data, string pathname)                                                                       
+{
+  char* hname = new char[200];
+  char* hist_name  = new char[200];
+  char* hist_name1 = new char[200];
+  char* hist_name2 = new char[200];
+  char* hist_name3 = new char[200];
+  char* hist_name4 = new char[200];
+  char* hist_name5 = new char[200];
+  char* hist_name6 = new char[200];
+  char* hist_name7 = new char[200];
+  char* hist_name8 = new char[200];
+  char* hist_name9 = new char[200];
+  char* title=new char[2000];
+  char* full_path1 = new char[2000];
+  char* full_path2 = new char[2000];
+  char* full_path3 = new char[2000];
+  char* full_path4 = new char[2000];
+  char* path2 = new char[2000];
+
+  char* hname1 = new char[2000];
+  char* hname2 = new char[200];
+  char* hname3 = new char[200];
+sprintf(hname,"%s",file_name.c_str());
+ sprintf(hname1,"%s",file_name_test.c_str());
+ sprintf(hname2,"%s",file_name_data.c_str());
+ sprintf(path2,"%s",pathname.c_str());
+  TFile * inputfile = new TFile(hname,"READ");
+   TFile * inputfile1 = new TFile(hname1,"READ");
+   TFile * inputfile2 = new TFile(hname2,"READ");
+  const char *data[5] = { "Valid", "Train",
+                         "Tbdata","QGSP","FTFP" };
+  // const char *data_1[3]={"Model_4inputFeat","Model_2inputFeat","Model_1inputFeat"};
+  // const char *data_2[3]={"Validation-1M","Training-1M","TB Data-1M"};
+  //const char *data_1[3]={"semiparam","nosemi","DRN (E)"};
+    const char *data_1[3]={"DRN-GaussEdge","DRN-Flat60to300","2agg_5M_MSI_logRatio_t4"};
+  const char* tag[3]={"Validation","Training","Data"};
+
+  const char *Energy[8]={"20","50","80","100","120","200","250","300"};
+  //  int Elist[8]={20,50,80,100,120,200,250,300};
+  int Elist[85] =  {10, 14 , 18 , 22 , 26 , 30,  34 , 38 , 42,  46,  50,  54,  58,  62,  66,  70,  74,  78,
+                     82,  86,  90,  94,  98, 102, 106, 110, 114 ,118, 122, 126, 130, 134, 138, 142 ,146, 150,
+                     154 ,158 ,162 ,166 ,170 ,174 ,178, 182, 186, 190 ,194 ,198, 202, 206, 210, 214 ,218, 222,
+                     226, 230, 234 ,238, 242 ,246 ,250, 254, 258 ,262 ,266, 270, 274, 278, 282, 286, 290, 294,
+                     298, 302 ,306, 310, 314, 318 ,322, 326, 330, 334 ,338 ,342 ,346};
+
+  int marker[5]={8, 22,21, 29, 34};
+ int col[20]={kGreen+2, kRed+2, kBlue,kMagenta,kGreen+2,kBlack,kMagenta,kCyan+2};//,kBlue,kRed,kBlue+2,kMagenta,kCyan};
+ float point_size[5] = {1.1,1.1,1.1,1,1};
+int point_style[5] = {kFullCircle,kOpenSquare,kOpenTriangleUp,kFullTriangleDown,kOpenTriangleUp};
+int point_col[20] = {kGreen+2, kRed+2, kBlue, kMagenta, kGreen+2, kBlue, kRed};
+
+//  TMultiGraph* mg = new TMultiGraph();
+//   TMultiGraph* mg1 = new TMultiGraph();
+// auto legend = new TLegend(0.7,0.6,0.9,0.9);
+//   legend->SetHeader("","C");
+//   gStyle->SetLegendTextSize(0.05);
+//   auto legend1 = new TLegend(0.7,0.1,0.9,0.4);
+//   legend1->SetHeader("","C");
+const char *eve_cat[2] = { "SSinEE", "MipsInEE"};
+ // sprintf(full_path1,"%s/%s_overlay_resolution_v1.png",eve_cat[0],path2);
+ //      sprintf(full_path2,"%s/%s_overlay_response_v1.png",path2);
+      //const char *eve_cat[2] = { "SSinEE", "MipsInEE"};
+  // for(int i=0;i<2;i++)
+    
+  //       {
+ // sprintf(full_path1,"%s/overlay_reso_FullAhcal_1Mwith5M.png",path2);//,eve_cat[i]);
+ // sprintf(full_path2,"%s/overlay_resp_FullAhcal_1Mwith5M.png",path2);//,eve_cat[i]);
+ // TMultiGraph* mg = new TMultiGraph();
+//   TMultiGraph* mg1 = new TMultiGraph();
+// auto legend = new TLegend(0.55,0.65,0.9,0.9);
+//   legend->SetHeader("","C");
+//   gStyle->SetLegendTextSize(0.04);
+//   auto legend1 = new TLegend(0.55,0.1,0.9,0.3);
+//   legend1->SetHeader("","C");
+
+  for (int i_data=0; i_data<2;i_data++)
+    {
+      TMultiGraph* mg = new TMultiGraph();
+      TMultiGraph* mg1 = new TMultiGraph();
+      TMultiGraph* mg_ratio = new TMultiGraph();
+      TMultiGraph* mg1_ratio = new TMultiGraph();
+            gStyle->SetLegendTextSize(0.05);
+
+      auto legend = new TLegend(0.45,0.55,0.8,0.85);
+      legend->SetLineColor(kWhite);
+      char* lhead = new char[100];
+      sprintf(lhead,"%s :  #bf{#pi^{-}}",tag[i_data]);	
+      legend->SetHeader(lhead);
+
+      //legend->SetHeader("","C");
+      gStyle->SetLegendTextSize(0.065);
+      auto legend1 = new TLegend(0.45,0.68,0.8,0.95);//0.5,0.15,0.9,0.3);
+      legend1->SetLineColor(kWhite);
+      char* lhead1 = new char[100];
+      sprintf(lhead1,"%s :  #bf{#pi^{-}}",tag[i_data]);
+      legend1->SetHeader(lhead1);
+
+      //legend1->SetHeader("","C");      
+      sprintf(hist_name1,"Resolution_%s",data[i_data]);
+      sprintf(hist_name,"Response_%s",data[i_data]);
+      sprintf(full_path1,"%s/%s_reso_constlr_diffipFeat_ep100.png",path2,data[i_data]);                                            
+      sprintf(full_path2,"%s/%s_resp_constlr_diffipFeat_ep100.png",path2,data[i_data]);
+      sprintf(full_path3,"%s/%s_reso_constlr_diffipFeat_ep100.pdf",path2,data[i_data]);
+      sprintf(full_path4,"%s/%s_resp_constlr_diffipFeat_ep100.pdf",path2,data[i_data]);
+
+      TGraphErrors* h_resolution_valid = (TGraphErrors*)inputfile->Get(hist_name1);
+      TGraphErrors* h_response_valid = (TGraphErrors*)inputfile->Get(hist_name);
+      // float resol,respo;
+      // for (int ibin=0;ibin<8;ibin++)
+      // 	{
+      // 	  resol = h_resolution_valid->GetPointY(ibin);
+      // 	  respo= h_response_valid->GetPointY(ibin);
+      // 	}
+      //TGraph* h_reso_ratio = 
+      h_resolution_valid->SetTitle(" ");
+      h_resolution_valid->GetXaxis()->SetTitle("Beam energy (GeV)");
+      h_resolution_valid->GetYaxis()->SetTitleOffset(1.4);
+      h_resolution_valid->GetYaxis()->SetTitle("Relative resolution (%)");
+      h_resolution_valid->SetMarkerColorAlpha(col[0], 0.95);
+      h_resolution_valid->SetMarkerSize(point_size[0]);
+      h_resolution_valid->SetMarkerStyle(marker[0]);
+      h_response_valid->SetTitle(" ");
+      h_response_valid->GetXaxis()->SetTitle("Beam energy (GeV)");
+      h_response_valid->GetYaxis()->SetTitleOffset(1.4);
+      h_response_valid->GetYaxis()->SetTitle("Energy response");
+      h_response_valid->SetMarkerColorAlpha(col[0], 0.95);
+      h_response_valid->SetMarkerSize(point_size[0]);
+      h_response_valid->SetMarkerStyle(marker[0]);
+      h_response_valid->SetLineColor(col[0]);
+      h_resolution_valid->SetLineColor(col[0]);
+
+      mg->Add(h_resolution_valid);
+      mg1->Add(h_response_valid);
+      TLegendEntry* l1 = legend->AddEntry(h_resolution_valid,data_1[0],"ep");
+      l1->SetTextColor(col[0]);
+      TLegendEntry* l2 = legend1->AddEntry(h_resolution_valid,data_1[0],"ep");;
+      l2->SetTextColor(col[0]);
+
+      TGraphErrors* h_resolution_valid1 = (TGraphErrors*)inputfile1->Get(hist_name1);
+      TGraphErrors* h_response_valid1 = (TGraphErrors*)inputfile1->Get(hist_name);
+      h_resolution_valid1->SetTitle(" ");
+      h_resolution_valid1->GetXaxis()->SetTitle("Beam energy (GeV)");
+      h_resolution_valid1->GetYaxis()->SetTitleOffset(1.4);
+      h_resolution_valid1->GetYaxis()->SetTitle("Relative resolution (%)");
+      h_resolution_valid1->SetMarkerColorAlpha(col[1], 0.95);
+      h_resolution_valid1->SetMarkerSize(point_size[1]);
+      h_resolution_valid1->SetMarkerStyle(marker[1]);
+      h_response_valid1->SetTitle(" ");
+      h_response_valid1->GetXaxis()->SetTitle("Beam energy (GeV)");
+      h_response_valid1->GetYaxis()->SetTitleOffset(1.4);
+      h_response_valid1->GetYaxis()->SetTitle("Energy response");
+      h_response_valid1->SetMarkerColorAlpha(col[1], 0.95);
+      h_response_valid1->SetLineColor(col[1]);
+      h_resolution_valid1->SetLineColor(col[1]);
+      h_response_valid1->SetMarkerSize(point_size[1]);
+      h_response_valid1->SetMarkerStyle(marker[1]);
+      mg->Add(h_resolution_valid1);
+      mg1->Add(h_response_valid1);
+        TLegendEntry* l11 = legend->AddEntry(h_resolution_valid1,data_1[1],"ep");
+      l11->SetTextColor(col[1]);
+      TLegendEntry* l21 = legend1->AddEntry(h_resolution_valid1,data_1[1],"ep");;
+      l21->SetTextColor(col[1]);
+
+      TGraphErrors* h_resolution_shubham = (TGraphErrors*)inputfile2->Get(hist_name1);
+    TGraphErrors* h_response_shubham = (TGraphErrors*)inputfile2->Get(hist_name);
+    h_resolution_shubham->SetMarkerColorAlpha(col[2],0.99);
+    h_resolution_shubham->SetMarkerSize(point_size[2]);
+    h_resolution_shubham->SetMarkerStyle(marker[2]);
+    h_resolution_shubham->SetLineColor(col[2]);
+    h_resolution_shubham->SetLineStyle(1);
+    h_resolution_shubham->SetLineWidth(2);
+    h_response_shubham->SetMarkerColorAlpha(col[2], 0.95);
+    h_response_shubham->SetMarkerSize(point_size[2]);
+    h_response_shubham->SetMarkerStyle(marker[2]);
+    h_response_shubham->SetLineColor(col[2]);
+    h_response_shubham->SetLineStyle(1);
+    h_response_shubham->SetLineWidth(2);
+
+    //mg->Add(h_resolution_shubham);
+    //mg1->Add(h_response_shubham);
+    //TLegendEntry* l12 = legend->AddEntry(h_resolution_shubham,data_1[2],"ep");
+      //l12->SetTextColor(col[2]);
+      //TLegendEntry* l22 = legend1->AddEntry(h_resolution_shubham,data_1[2],"ep");;
+      //l22->SetTextColor(col[2]);
+      TGraph* h_resolution_1feat = new TGraph();
+      TGraph* h_response_1feat = new TGraph();
+      TGraph* h_resolution_2feat = new TGraph();
+      TGraph* h_response_2feat = new TGraph();
+
+      float resol_4feat,respo_4feat,resol_2feat,respo_2feat,resol_1feat,respo_1feat;
+      for (int ibin=12;ibin<73;ibin++)
+        {
+	  cout<<h_resolution_valid->GetPointY(ibin-12)<<endl;
+          resol_4feat = h_resolution_valid->GetPointY(ibin-12);
+          respo_4feat= h_response_valid->GetPointY(ibin-12);
+	  resol_2feat = h_resolution_valid1->GetPointY(ibin-12);
+          respo_2feat= h_response_valid1->GetPointY(ibin-12);
+	  resol_1feat = h_resolution_shubham->GetPointY(ibin-12);
+          respo_1feat= h_response_shubham->GetPointY(ibin-12);
+	  float ratio_reso2feat = (resol_2feat/resol_4feat);
+	  float	ratio_resp2feat = (respo_2feat/respo_4feat);
+	  float	ratio_reso1feat = (resol_1feat/resol_4feat);
+          float ratio_resp1feat = (respo_1feat/respo_4feat);
+	  h_resolution_2feat->SetPoint(ibin-12, Elist[ibin]+2,ratio_reso2feat);
+	  h_resolution_1feat->SetPoint(ibin-12, Elist[ibin]+2,ratio_reso1feat);
+	  h_response_2feat->SetPoint(ibin-12, Elist[ibin]+2,ratio_resp2feat);
+	  h_response_1feat->SetPoint(ibin-12, Elist[ibin]+2,ratio_resp1feat);
+	  
+        }
+      h_response_2feat->SetMarkerColorAlpha(col[1], 0.95);
+      h_response_2feat->SetMarkerSize(1.0);
+      h_response_2feat->SetMarkerStyle(marker[1]);
+      h_response_2feat->SetLineColor(col[1]);
+      h_response_2feat->SetLineStyle(1);
+      h_response_2feat->SetLineWidth(2);
+
+       h_response_1feat->SetMarkerColorAlpha(col[2], 0.95);
+      h_response_1feat->SetMarkerSize(1.0);
+      h_response_1feat->SetMarkerStyle(marker[2]);
+      h_response_1feat->SetLineColor(col[2]);
+      h_response_1feat->SetLineStyle(1);
+      h_response_1feat->SetLineWidth(2);
+
+      h_resolution_2feat->SetMarkerColorAlpha(col[1], 0.95);
+      h_resolution_2feat->SetMarkerSize(1.0);
+      h_resolution_2feat->SetMarkerStyle(marker[1]);
+      h_resolution_2feat->SetLineColor(col[1]);
+      h_resolution_2feat->SetLineStyle(1);
+      h_resolution_2feat->SetLineWidth(2);
+
+      h_resolution_1feat->SetMarkerColorAlpha(col[2], 0.95);
+      h_resolution_1feat->SetMarkerSize(1.0);
+      h_resolution_1feat->SetMarkerStyle(marker[2]);
+      h_resolution_1feat->SetLineColor(col[2]);
+      h_resolution_1feat->SetLineStyle(1);
+      h_resolution_1feat->SetLineWidth(2);
+
+      mg_ratio->Add(h_resolution_2feat);
+      //mg_ratio->Add(h_resolution_1feat);
+      mg1_ratio->Add(h_response_2feat);
+      //mg1_ratio->Add(h_response_1feat);          
+      TCanvas *canvas_n1 = new TCanvas(hist_name, hist_name,850,750);//600,600,1200,1200);
+           canvas_n1->Range(-60.25,-0.625,562.25,0.625);
+      canvas_n1->SetFillColor(0);
+      canvas_n1->SetBorderMode(0);
+      canvas_n1->SetBorderSize(2);
+      auto *pad_1 = new TPad("pad_1","pad_1",0.,0.0,1.,0.32); pad_1->Draw();
+      pad_1->SetTopMargin(0.0013);
+      pad_1->SetBottomMargin(0.3);
+      pad_1->SetRightMargin(0.025);
+      pad_1->SetLeftMargin(0.14);
+
+       auto *p1 = new TPad("p1","p1",0.,0.32,1.,1.);  p1->Draw();
+       p1->SetBottomMargin(0.001);
+       p1->SetRightMargin(0.025);
+       p1->SetLeftMargin(0.14);
+       p1->cd();
+       p1->SetGrid();
+  mg->GetXaxis()->SetTitle("Energy [GeV]");
+  mg->GetYaxis()->SetTitle("Relative resolution");
+
+    mg->GetXaxis()->SetTitleSize(0.08);
+    mg->GetXaxis()->SetLabelSize(0.05);
+
+    mg->GetYaxis()->SetTitleSize(0.07);
+    mg->GetYaxis()->SetLabelSize(0.05);
+
+    mg->GetXaxis()->SetTitleOffset(0.8);
+    mg->GetYaxis()->SetTitleOffset(1.0);
+  mg->SetMinimum(0.01);
+  mg->SetMaximum(0.15);
+
+mg->Draw("ALP");legend->Draw("sames");gPad->Modified();
+  gPad->Update();
+  // mg->SetMinimum(0.02);
+  // mg->SetMaximum(0.15);
+  //  legend->Draw("sames");
+  canvas_n1->cd();
+
+    TLatex* textOnTop = new TLatex();
+     textOnTop->SetTextSize(0.03);
+     textOnTop->DrawLatexNDC(0.16,0.937,"Simulation");
+
+
+
+    pad_1->cd();
+    pad_1->SetGrid();  
+   mg_ratio->GetXaxis()->SetTitle("Energy [GeV]");
+   mg_ratio->GetXaxis()->SetTitleOffset(0.8);
+
+   mg_ratio->GetYaxis()->SetTitleOffset(1.2);
+   mg_ratio->GetYaxis()->SetRangeUser(0.5,1.3);
+   mg_ratio->GetXaxis()->SetTitleSize(0.13);
+   mg_ratio->GetXaxis()->SetLabelSize(0.1);
+
+
+    mg_ratio->GetYaxis()->SetLabelSize(0.1);
+    mg_ratio->GetYaxis()->SetTitle("Ratio");
+    mg_ratio->GetYaxis()->SetTitleSize(0.13);
+    mg_ratio->GetYaxis()->SetTitleOffset(.5);
+    mg_ratio->GetYaxis()->SetNdivisions(505);
+
+  mg_ratio->Draw("ALP");
+TLine* l_2=new TLine(50,1.0,312 ,1.0);
+  l_2->Draw("sames");
+  
+  canvas_n1->Modified();
+  canvas_n1->cd();
+  canvas_n1->SetSelected(canvas_n1);
+  canvas_n1->SaveAs(full_path1);
+  canvas_n1->SaveAs(full_path3);
+  TCanvas *canvas_n2 = new TCanvas(hist_name1, hist_name1,800,700);//,1200,1200);
+  //canvas_n2->Range(-60.25,-0.625,562.25,0.625);
+  canvas_n2->SetRightMargin(0.025);
+  canvas_n2->SetLeftMargin(0.14);
+  canvas_n2->SetTopMargin(0.034);
+   canvas_n2->SetBottomMargin(0.12);
+
+
+
+
+  canvas_n2->SetFillColor(0);
+  canvas_n2->SetBorderMode(0);
+  canvas_n2->SetBorderSize(2);
+    // auto *pad_2 = new TPad("pad_2","pad_2",0.,0.0,1.,0.32); pad_2->Draw();
+    //   pad_2->SetTopMargin(0.0013);
+    //   pad_2->SetBottomMargin(0.3);
+    //   pad_2->SetRightMargin(0.025);
+    //   pad_2->SetLeftMargin(0.14);
+
+    //    auto *p2 = new TPad("p2","p2",0.,0.32,1.,1.);  p2->Draw();
+    //    p2->SetBottomMargin(0.001);
+    //    p2->SetRightMargin(0.025);
+    //    p2->SetLeftMargin(0.14);
+    //    p2->cd();
+canvas_n2->SetGrid();
+ canvas_n2->cd();
+  mg1->GetXaxis()->SetTitle("Energy [GeV]");
+  mg1->GetYaxis()->SetTitle("Energy response");
+
+    mg1->GetXaxis()->SetTitleSize(0.045);
+    mg1->GetXaxis()->SetLabelSize(0.04);
+
+    mg1->GetYaxis()->SetTitleSize(0.045);
+    mg1->GetYaxis()->SetLabelSize(0.04);
+
+    mg1->GetXaxis()->SetTitleOffset(0.9);
+    mg1->GetYaxis()->SetTitleOffset(1.2);
+
+    mg1->Draw("ALP");//legend->Draw("sames");
+    gPad->Modified();
+  gPad->Update();
+  mg1->SetMinimum(0.8);
+  mg1->SetMaximum(1.2);
+  gStyle->SetLegendTextSize(0.045);
+
+  legend1->Draw("sames");
+  // canvas_n1->cd();
+
+  //   pad_2->cd();
+  //   pad_2->SetGrid();
+  //  mg1_ratio->GetXaxis()->SetTitle("Energy [GeV]");
+  //  mg1_ratio->GetXaxis()->SetTitleOffset(0.8);
+
+  //  mg1_ratio->GetYaxis()->SetTitleOffset(1.4);
+  //  mg1_ratio->GetYaxis()->SetRangeUser(0.9,1.4);
+  //  mg1_ratio->GetXaxis()->SetTitleSize(0.13);
+  //  mg1_ratio->GetXaxis()->SetLabelSize(0.1);
+
+
+  //   mg1_ratio->GetYaxis()->SetLabelSize(0.1);
+  //   mg1_ratio->GetYaxis()->SetTitle("Ratio");
+  //   mg1_ratio->GetYaxis()->SetTitleSize(0.13);
+  //   mg1_ratio->GetYaxis()->SetTitleOffset(.5);
+  //   mg1_ratio->GetYaxis()->SetNdivisions(505);
+
+  // mg1_ratio->Draw("ALP");
+
+//   TPad *pad_2 = new TPad("pad_2", "pad_2", 0, 0.3, 1, 1.0);
+//   pad_2->SetBottomMargin(0.01); // Upper and lower plot are joined                                                                          
+//   pad_2->Draw();             // Draw the upper pad: pad_2                                                                                   
+//   pad_2->cd();
+// pad_2->SetGrid();
+//   mg1->GetXaxis()->SetTitle("Energy [GeV]");
+//   mg1->GetYaxis()->SetTitleOffset(1.4);
+//   mg1->GetYaxis()->SetTitle("Energy response");
+//   TAxis *axis51=  mg1->GetYaxis();
+//   axis51->SetRangeUser(0.9,1.4);
+//   axis51->SetLabelSize(0.05);
+//   axis51->SetTitleOffset(0.90);
+//   axis51->SetTitleSize(0.05);
+//   canvas_n2->SetGrid();
+//   mg1->GetHistogram()->GetYaxis()->SetRangeUser(0.8,1.2);
+//   gPad->Modified();
+//   gPad->Update();
+//   mg1->Draw("ALP");
+//   legend->Draw("sames");
+//   TLine* l=new TLine(0,1,300,1);
+//   l->Draw("sames");
+//   canvas_n2->cd();
+//   TPad *pad1 = new TPad("pad1", "pad1", 0, 0.05, 1, 0.3);
+//   pad1->SetTopMargin(0.03);
+//   pad1->SetBottomMargin(0.15);
+//   pad1->SetName("");
+//   pad1->Draw();
+//   pad1->cd();
+//   pad1->SetGrid();
+//   mg1_ratio->GetXaxis()->SetTitle("Energy [GeV]");
+//   mg1_ratio->GetXaxis()->SetTitleOffset(1.4);
+
+//   mg1_ratio->GetYaxis()->SetTitleOffset(1.4);
+//   TAxis *axis6=  mg1_ratio->GetYaxis();
+//   axis6->SetLabelSize(0.12);
+//   axis6->SetRangeUser(0.8,1.4);
+//   TAxis *axis6X=  mg1_ratio->GetXaxis();
+//   axis6X->SetLabelSize(0.01);
+//   axis6X->SetLabelSize(0.15);
+//   axis6X->SetTitleOffset(-3.0);
+//   axis6X->SetTitleSize(0.15);
+
+//   mg1_ratio->Draw("ALP");
+
+    TLatex* textOnTop_ = new TLatex();
+     textOnTop_->SetTextSize(0.03);
+     textOnTop_->DrawLatexNDC(0.16,0.97,"Simulation");
+
+
+
+  TLine* l_1=new TLine(50,1.0,312,1.0);
+  l_1->Draw("sames");
+  //  legend->Draw("sames");
+  gPad->Modified();
+  gPad->Update();
+ canvas_n2->Modified();
+  canvas_n2->cd();
+  canvas_n2->SetSelected(canvas_n2);
+  canvas_n2->SaveAs(full_path2);
+  canvas_n2->SaveAs(full_path4);
+  }
+
+}
