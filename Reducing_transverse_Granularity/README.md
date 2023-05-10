@@ -10,4 +10,4 @@ Details of the files:
 
 4) reducing_transverse_granularity_AHCAL_by16.ipynb : creates xy map for combined neighboring cells for AHCAL section (for reducing transverse granularity by factor of 16)
 
-5) create_pkl_files.ipynb : creates new reduced rechit_x, rechit_y, rechit_z, rechit_ene given the xy mapping 
+5) create_pkl_files.ipynb : creates new reduced rechit_x, rechit_y, rechit_z, rechit_ene given the xy mapping. This only created the new rechit x,y,z,E. For creating pickle files for training, follow the DRN source code.
